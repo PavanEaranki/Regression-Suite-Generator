@@ -10,7 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.post("/generate-tests", async (req, res) => {
 
@@ -35,22 +35,27 @@ ${diff}
 `;
 
     const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      "https://openrouter.ai/api/v1/chat/completions",
       {
-        contents: [
+        model: "meta-llama/llama-3.1-8b-instruct:free",
+
+        messages: [
           {
-            parts: [
-              {
-                text: prompt
-              }
-            ]
+            role: "user",
+            content: prompt
           }
         ]
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json"
+        }
       }
     );
 
     const generatedText =
-      response.data.candidates[0].content.parts[0].text;
+      response.data.choices[0].message.content;
 
     res.json({
       tests: generatedText
@@ -65,7 +70,6 @@ ${diff}
     res.status(500).json({
       error: "Failed to generate tests"
     });
-
   }
 });
 
