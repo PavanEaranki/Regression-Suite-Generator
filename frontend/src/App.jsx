@@ -15,7 +15,7 @@ function App() {
       setLoading(true);
 
       const response = await axios.post(
-        "http://localhost:5000/generate-tests",
+        "https://regression-suite-generator.onrender.com/generate-tests",
         { diff }
       );
 
